@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang='cs'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>Geo kvíz</title>
+<style>
+body { font-family: Arial; text-align: center; padding: 20px; }
+img { max-width: 300px; margin: 20px 0; }
+button { display:block; margin:10px auto; padding:10px; width:200px; font-size:16px; }
+</style>
+</head>
+<body>
+
+<h2 id='teamSection'>Zadej název týmu</h2>
+<input id='teamInput' placeholder='Název týmu' />
+<button onclick='startGame()'>Start</button>
+
+<div id='game' style='display:none;'>
+<h3 id='teamName'></h3>
+<h2 id='counter'></h2>
+<img id='image' src='' />
+<div id='options'></div>
+</div>
+
+<script>
+const quiz = [
+{image:'images/paraguay.png', options:['Paraguay','Chile','Peru','Bolívie']},
+{image:'images/vietnam.png', options:['Thajsko','Vietnam','Laos','Kambodža']},
+{image:'images/japonsko.png', options:['Filipíny','Japonsko','Indonésie','Korea']},
+{image:'images/chile.png', options:['Chile','Argentina','Peru','Brazílie']},
+{image:'images/severni-korea.png', options:['Jižní Korea','Čína','Severní Korea','Japonsko']},
+{image:'images/nizozemsko.png', options:['Belgie','Nizozemsko','Německo','Dánsko']},
+{image:'images/chorvatsko.png', options:['Řecko','Chorvatsko','Itálie','Albánie']},
+{image:'images/novy-zeland.png', options:['Austrálie','Nový Zéland','Fidži','Papua']},
+{image:'images/kuba.png', options:['Kuba','Jamajka','Haiti','Bahamy']},
+{image:'images/gronsko.png', options:['Island','Grónsko','Norsko','Kanada']}
+];
+
+let index = 0;
+
+function startGame(){
+const name = document.getElementById('teamInput').value;
+if(!name){ alert('Zadej název týmu'); return; }
+
+localStorage.setItem('team', name);
+
+document.getElementById('teamSection').style.display='none';
+document.getElementById('teamInput').style.display='none';
+document.querySelector('button').style.display='none';
+document.getElementById('game').style.display='block';
+document.getElementById('teamName').innerText='Tým: ' + name;
+
+showQuestion();
+}
+
+function showQuestion(){
+const q = quiz[index];
+
+document.getElementById('counter').innerText = (index+1) + ' / ' + quiz.length;
+document.getElementById('image').src = q.image;
+
+const container = document.getElementById('options');
+container.innerHTML='';
+
+q.options.forEach(opt => {
+const btn = document.createElement('button');
+btn.innerText = opt;
+btn.onclick = () => submitAnswer(opt);
+container.appendChild(btn);
+});
+}
+
+function submitAnswer(answer){
+const team = localStorage.getItem('team');
+
+fetch("https://script.google.com/macros/s/AKfycbzhuTtUD9GqM0FhlCYsK_P7zwDFbbbS69GAMbbEy2bRnHsXXjg3sIDjespbjl6pu7BCZA/exec", {
+  method: "POST",
+  body: JSON.stringify({
+    team: team,
+    question: index + 1,
+    answer: answer
+  })
+});
+
+nextQuestion();
+}
+
+function nextQuestion(){
+index++;
+if(index < quiz.length){
+showQuestion();
+} else {
+alert('✅ Hotovo!');
+}
+}
+</script>
+
+</body>
+</html>
