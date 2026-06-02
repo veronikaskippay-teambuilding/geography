@@ -82,9 +82,11 @@ function submitAnswer(answer){
       question: index + 1,
       answer: answer
     })
+  }).finally(() => {
+    setTimeout(() => {
+      nextQuestion();
+    }, 300); // malá prodleva
   });
-
-  nextQuestion();
 }
 
 function nextQuestion(){
